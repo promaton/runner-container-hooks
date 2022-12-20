@@ -1,0 +1,12 @@
+FROM summerwind/actions-runner:latest
+
+WORKDIR /home/runner
+
+COPY packages/k8s/dist/index.js /index.js
+COPY packages/k8s/tests/jobtemplate.yaml /template.yaml
+
+ENV ACTIONS_RUNNER_CONTAINER_HOOK="/index.js"
+ENV ACTIONS_RUNNER_JOB_TEMPLATE_PATH="/template.yaml"
+
+RUN curl -o actions-runner-linux-x64-2.300.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.300.0/actions-runner-linux-x64-2.300.0.tar.gz \
+    && tar xzf ./actions-runner-linux-x64-2.300.0.tar.gz
