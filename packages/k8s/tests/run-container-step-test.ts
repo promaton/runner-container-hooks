@@ -47,6 +47,8 @@ describe('Run container step', () => {
   it('should have the extra fields set by the jobtemplate file if env variable is set', async () => {
 
     process.env.ACTIONS_RUNNER_JOB_TEMPLATE_PATH = path.resolve(__dirname, 'jobtemplate.yaml')
+    
+    runContainerStepData.args.systemMountVolumes = []
     const container = await createPodSpec(runContainerStepData.args)
     const job = await createJob(container)
 
