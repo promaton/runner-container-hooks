@@ -9,7 +9,7 @@
             "name": "run container test",
             "request": "launch",
             "program": "${workspaceFolder}/packages/k8s/node_modules/.bin/jest",
-            "args": ["packages/k8s/tests/run-container-step-test.ts", "--runInBand"],
+            "args": ["packages/k8s/tests/prepare-job-test.ts", "--runInBand"],
             "cwd": "${workspaceFolder}/packages/k8s",
             "console": "integratedTerminal",
         }

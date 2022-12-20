@@ -14,7 +14,6 @@ import {
 } from '../hooks/constants'
 import { PodPhase } from './utils'
 import * as fs from 'fs';
-import { V1Container } from '@kubernetes/client-node';
 
 
 const kc = new k8s.KubeConfig()
@@ -108,14 +107,27 @@ export async function createPod(
     appPod.spec.imagePullSecrets = [secretReference]
   }
 
+  //Enrich the job spec with the fields defined in the template if there is one
+  const podTemplatePath = process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH
+  if (podTemplatePath !== undefined){
+    const yaml = fs.readFileSync(podTemplatePath,'utf8');
+    const template = k8s.loadYaml<k8s.V1Pod>(yaml)
+    appPod.spec = _.mergeWith(appPod.spec, template.spec, concatArraysCustomizer)
+  }
+
   const { body } = await k8sApi.createNamespacedPod(namespace(), appPod)
   return body
 }
 
-//Custom function to pass to the lodash merge
-//Will concat all arrays it encounters during the merge
-//except for the container list of the spec
-function concatArraysCustomizer(objValue, srcValue): any[] | undefined {
+/**
+ * Custom function to pass to the lodash merge to merge the podSpec with the provided template. 
+ * Will concat all arrays it encounters during the merge, except for the container list of the spec. 
+ * Will also skip merging the "image", "name", "command" values of the template
+ */
+function concatArraysCustomizer(objValue, srcValue, key): any[] | undefined {
+  if (["image","name", "command"].includes(key)){
+    return objValue
+  }
   if (_.isArray(objValue)) {
     if ( objValue[0] instanceof k8s.V1Container){
       return
@@ -153,14 +165,6 @@ export async function createJob(
       persistentVolumeClaim: { claimName }
     }
   ]
-
-  //Enrich the job spec with the fields defined in the template if there is one
-  const jobTemplatePath = process.env.ACTIONS_RUNNER_JOB_TEMPLATE_PATH
-  if (jobTemplatePath !== undefined){
-    const yaml = fs.readFileSync(jobTemplatePath,'utf8');
-    const template = k8s.loadYaml<k8s.V1Job>(yaml)
-    job.spec.template.spec = _.mergeWith(job.spec.template.spec, template.spec?.template.spec, concatArraysCustomizer)
-  }
 
   const { body } = await k8sBatchV1Api.createNamespacedJob(namespace(), job)
   return body

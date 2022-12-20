@@ -49,6 +49,7 @@ export async function prepareJob(
     createdPod = await createPod(container, services, args.container.registry)
   } catch (err) {
     await prunePods()
+    console.trace(err)
     throw new Error(`failed to create job pod: ${err}`)
   }
 
