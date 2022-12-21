@@ -72,6 +72,8 @@ export async function createPod(
     containers.push(...services)
   }
 
+  const podTemplatePath = process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH
+
   const appPod = new k8s.V1Pod()
 
   appPod.apiVersion = 'v1'
@@ -88,7 +90,12 @@ export async function createPod(
   appPod.spec = new k8s.V1PodSpec()
   appPod.spec.containers = containers
   appPod.spec.restartPolicy = 'Never'
-  appPod.spec.nodeName = await getCurrentNodeName()
+
+  // nodename should not be set with template (will conflict w/ nodeselectors, GPU requests etc.)
+  if (podTemplatePath === undefined){
+    appPod.spec.nodeName = await getCurrentNodeName()
+  }
+
   const claimName = getVolumeClaimName()
   appPod.spec.volumes = [
     {
@@ -108,8 +115,8 @@ export async function createPod(
   }
 
   //Enrich the job spec with the fields defined in the template if there is one
-  const podTemplatePath = process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH
   if (podTemplatePath !== undefined){
+    core.debug("Podtemplate provided, merging fields with pod spec")
     const yaml = fs.readFileSync(podTemplatePath,'utf8');
     const template = k8s.loadYaml<k8s.V1Pod>(yaml)
     appPod.spec = _.mergeWith(appPod.spec, template.spec, concatArraysCustomizer)
@@ -122,14 +129,14 @@ export async function createPod(
 /**
  * Custom function to pass to the lodash merge to merge the podSpec with the provided template. 
  * Will concat all arrays it encounters during the merge, except for the container list of the spec. 
- * Will also skip merging the "image", "name", "command" values of the template
+ * Will also skip merging the "image", "name", "command", "args" values of the template
  */
 function concatArraysCustomizer(objValue, srcValue, key): any[] | undefined {
-  if (["image","name", "command"].includes(key)){
+  if (["image","name","command","args"].includes(key)){
     return objValue
   }
   if (_.isArray(objValue)) {
-    if ( objValue[0] instanceof k8s.V1Container){
+    if ( key == "containers"){
       return
     }
     return objValue.concat(srcValue);

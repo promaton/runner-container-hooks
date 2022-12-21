@@ -1,7 +1,7 @@
 # apiVersion: v1
 # kind: Pod
 # metadata:
-#   name: niels-test-container-hook2
+#   name: niels-test-container-hook
 # spec:
 #   containers:
 #   - name: runner
@@ -39,7 +39,7 @@ roleRef:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: niels-test-container-hook2-work
+  name: niels-test-container-hook-work
   namespace: default
 spec:
   accessModes:
