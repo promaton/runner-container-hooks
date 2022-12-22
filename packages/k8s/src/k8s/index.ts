@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as k8s from '@kubernetes/client-node'
-import * as _ from "lodash";
+import * as _ from 'lodash'
 
 import { ContainerInfo, Registry } from 'hooklib'
 import * as stream from 'stream'
@@ -13,8 +13,7 @@ import {
   RunnerInstanceLabel
 } from '../hooks/constants'
 import { PodPhase } from './utils'
-import * as fs from 'fs';
-
+import * as fs from 'fs'
 
 const kc = new k8s.KubeConfig()
 
@@ -92,7 +91,7 @@ export async function createPod(
   appPod.spec.restartPolicy = 'Never'
 
   // nodename should not be set with template (will conflict w/ nodeselectors, GPU requests etc.)
-  if (podTemplatePath === undefined){
+  if (podTemplatePath === undefined) {
     appPod.spec.nodeName = await getCurrentNodeName()
   }
 
@@ -115,11 +114,15 @@ export async function createPod(
   }
 
   //Enrich the job spec with the fields defined in the template if there is one
-  if (podTemplatePath !== undefined){
-    core.debug("Podtemplate provided, merging fields with pod spec")
-    const yaml = fs.readFileSync(podTemplatePath,'utf8');
+  if (podTemplatePath !== undefined) {
+    core.debug('Podtemplate provided, merging fields with pod spec')
+    const yaml = fs.readFileSync(podTemplatePath, 'utf8')
     const template = k8s.loadYaml<k8s.V1Pod>(yaml)
-    appPod.spec = _.mergeWith(appPod.spec, template.spec, concatArraysCustomizer)
+    appPod.spec = _.mergeWith(
+      appPod.spec,
+      template.spec,
+      concatArraysCustomizer
+    )
   }
 
   const { body } = await k8sApi.createNamespacedPod(namespace(), appPod)
@@ -127,19 +130,19 @@ export async function createPod(
 }
 
 /**
- * Custom function to pass to the lodash merge to merge the podSpec with the provided template. 
- * Will concat all arrays it encounters during the merge, except for the container list of the spec. 
+ * Custom function to pass to the lodash merge to merge the podSpec with the provided template.
+ * Will concat all arrays it encounters during the merge, except for the container list of the spec.
  * Will also skip merging the "image", "name", "command", "args" values of the template
  */
 function concatArraysCustomizer(objValue, srcValue, key): any[] | undefined {
-  if (["image","name","command","args"].includes(key)){
+  if (['image', 'name', 'command', 'args'].includes(key)) {
     return objValue
   }
   if (_.isArray(objValue)) {
-    if ( key == "containers"){
+    if (key == 'containers') {
       return
     }
-    return objValue.concat(srcValue);
+    return objValue.concat(srcValue)
   }
 }
 

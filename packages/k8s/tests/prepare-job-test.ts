@@ -4,9 +4,17 @@ import { cleanupJob, createPodSpec } from '../src/hooks'
 import { createContainerSpec, prepareJob } from '../src/hooks/prepare-job'
 import { TestHelper } from './test-setup'
 import { createJob, createPod } from '../src/k8s'
-import { V1EnvVar, V1ResourceRequirements, V1Volume, V1VolumeMount } from '@kubernetes/client-node'
+import {
+  V1EnvVar,
+  V1ResourceRequirements,
+  V1Volume,
+  V1VolumeMount
+} from '@kubernetes/client-node'
 import { JOB_CONTAINER_NAME } from '../src/hooks/constants'
-import { DEFAULT_CONTAINER_ENTRY_POINT, DEFAULT_CONTAINER_ENTRY_POINT_ARGS } from '../src/k8s/utils'
+import {
+  DEFAULT_CONTAINER_ENTRY_POINT,
+  DEFAULT_CONTAINER_ENTRY_POINT_ARGS
+} from '../src/k8s/utils'
 
 jest.useRealTimers()
 
@@ -77,28 +85,49 @@ describe('Prepare job', () => {
   // })
 
   it('should have the extra fields set by the jobtemplate file if env variable is set', async () => {
+    process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH = path.resolve(
+      __dirname,
+      'podtemplate.yaml'
+    )
 
-    process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH = path.resolve(__dirname, 'podtemplate.yaml')
-    
-    const container = createContainerSpec(prepareJobData.args.container, JOB_CONTAINER_NAME, true)
+    const container = createContainerSpec(
+      prepareJobData.args.container,
+      JOB_CONTAINER_NAME,
+      true
+    )
     const services = prepareJobData.args.services.map(service => {
       return createContainerSpec(service, service.image.split(':')[0])
     })
     const pod = await createPod(container, services)
 
     // name, image,command,args should not be overwritten
-    expect(pod.spec?.containers[0].name).toEqual("job")
-    expect(pod.spec?.containers[0].image).toEqual("node:14.16")
-    expect(pod.spec?.containers[0].command).toEqual([DEFAULT_CONTAINER_ENTRY_POINT])
-    expect(pod.spec?.containers[0].args).toEqual(DEFAULT_CONTAINER_ENTRY_POINT_ARGS)
-    
+    expect(pod.spec?.containers[0].name).toEqual('job')
+    expect(pod.spec?.containers[0].image).toEqual('node:14.16')
+    expect(pod.spec?.containers[0].command).toEqual([
+      DEFAULT_CONTAINER_ENTRY_POINT
+    ])
+    expect(pod.spec?.containers[0].args).toEqual(
+      DEFAULT_CONTAINER_ENTRY_POINT_ARGS
+    )
+
     // nodename should not be set with template (due to nodeselectors, GPU requests etc.)
     expect(pod.spec?.nodeName).toEqual(undefined)
 
     //rest of template should be appended
-    expect(pod.spec?.containers[0].env).toContainEqual({"name": "TEST", "value": "testvalue"} as V1EnvVar)
-    expect(pod.spec?.containers[0].resources).toEqual({"requests": {"ephemeral-storage": "500Mi"}} as V1ResourceRequirements)
-    expect(pod.spec?.containers[0].volumeMounts).toContainEqual({"name": "ephemeral", "mountPath": "/tmp"} as V1VolumeMount)
-    expect(pod.spec?.volumes).toContainEqual({"name": "ephemeral", "emptyDir": {"sizeLimit": "500Mi"}} as V1Volume)
+    expect(pod.spec?.containers[0].env).toContainEqual({
+      name: 'TEST',
+      value: 'testvalue'
+    } as V1EnvVar)
+    expect(pod.spec?.containers[0].resources).toEqual({
+      requests: { 'ephemeral-storage': '500Mi' }
+    } as V1ResourceRequirements)
+    expect(pod.spec?.containers[0].volumeMounts).toContainEqual({
+      name: 'ephemeral',
+      mountPath: '/tmp'
+    } as V1VolumeMount)
+    expect(pod.spec?.volumes).toContainEqual({
+      name: 'ephemeral',
+      emptyDir: { sizeLimit: '500Mi' }
+    } as V1Volume)
   })
 })
