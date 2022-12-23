@@ -30,17 +30,22 @@ describe('Prepare job', () => {
     await testHelper.initialize()
     prepareJobData = testHelper.getPrepareJobDefinition()
     prepareJobOutputFilePath = testHelper.createFile('prepare-job-output.json')
+
+    process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH = path.resolve(
+      __dirname,
+      'podtemplate.yaml'
+    )
   })
   afterEach(async () => {
     await cleanupJob()
     await testHelper.cleanup()
   })
 
-  // it('should not throw exception', async () => {
-  //   await expect(
-  //     prepareJob(prepareJobData.args, prepareJobOutputFilePath)
-  //   ).resolves.not.toThrow()
-  // })
+  it('should not throw exception', async () => {
+    await expect(
+      prepareJob(prepareJobData.args, prepareJobOutputFilePath)
+    ).resolves.not.toThrow()
+  })
 
   // it('should generate output file in JSON format', async () => {
   //   await prepareJob(prepareJobData.args, prepareJobOutputFilePath)
@@ -109,9 +114,6 @@ describe('Prepare job', () => {
     expect(pod.spec?.containers[0].args).toEqual(
       DEFAULT_CONTAINER_ENTRY_POINT_ARGS
     )
-
-    // nodename should not be set with template (due to nodeselectors, GPU requests etc.)
-    expect(pod.spec?.nodeName).toEqual(undefined)
 
     //rest of template should be appended
     expect(pod.spec?.containers[0].env).toContainEqual({

@@ -89,11 +89,7 @@ export async function createPod(
   appPod.spec = new k8s.V1PodSpec()
   appPod.spec.containers = containers
   appPod.spec.restartPolicy = 'Never'
-
-  // nodename should not be set with template (will conflict w/ nodeselectors, GPU requests etc.)
-  if (podTemplatePath === undefined) {
-    appPod.spec.nodeName = await getCurrentNodeName()
-  }
+  appPod.spec.nodeName = await getCurrentNodeName()
 
   const claimName = getVolumeClaimName()
   appPod.spec.volumes = [

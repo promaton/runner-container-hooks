@@ -30,7 +30,7 @@ async function run(): Promise<void> {
         await prepareJob(args as prepareJobArgs, responseFile)
         break
       case Command.CleanupJob:
-        // await cleanupJob()
+        await cleanupJob()
         break
       case Command.RunScriptStep:
         await runScriptStep(args, state, null)

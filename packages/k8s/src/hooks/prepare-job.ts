@@ -17,6 +17,7 @@ import {
   PodPhase
 } from '../k8s/utils'
 import { JOB_CONTAINER_NAME } from './constants'
+import { HttpError } from '@kubernetes/client-node'
 
 export async function prepareJob(
   args: prepareJobArgs,
@@ -49,7 +50,9 @@ export async function prepareJob(
     createdPod = await createPod(container, services, args.container.registry)
   } catch (err) {
     await prunePods()
-    console.trace(err)
+    if (err instanceof HttpError){
+      core.error(err.body)
+    }
     throw new Error(`failed to create job pod: ${err}`)
   }
 
@@ -59,7 +62,7 @@ export async function prepareJob(
   core.debug(
     `Job pod created, waiting for it to come online ${createdPod?.metadata?.name}`
   )
-  core.debug(JSON.stringify(createdPod))
+  core.debug(k8s.dumpYaml(createdPod))
 
   try {
     await waitForPodPhases(
@@ -68,7 +71,7 @@ export async function prepareJob(
       new Set([PodPhase.PENDING])
     )
   } catch (err) {
-    // await prunePods()
+    await prunePods()
     throw new Error(`Pod failed to come online with error: ${err}`)
   }
 
