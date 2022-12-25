@@ -30,11 +30,6 @@ describe('Prepare job', () => {
     await testHelper.initialize()
     prepareJobData = testHelper.getPrepareJobDefinition()
     prepareJobOutputFilePath = testHelper.createFile('prepare-job-output.json')
-
-    process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH = path.resolve(
-      __dirname,
-      'podtemplate.yaml'
-    )
   })
   afterEach(async () => {
     await cleanupJob()
