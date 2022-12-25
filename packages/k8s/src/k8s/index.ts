@@ -134,7 +134,7 @@ function concatArraysCustomizer(objValue, srcValue, key): any[] | undefined {
     return objValue
   }
   if (_.isArray(objValue)) {
-    if (key == 'containers') {
+    if (key === 'containers') {
       return
     }
     return objValue.concat(srcValue)
