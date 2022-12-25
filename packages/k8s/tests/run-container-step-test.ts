@@ -1,14 +1,5 @@
-import {
-  V1EnvVar,
-  V1ResourceRequirements,
-  V1Volume,
-  V1VolumeMount
-} from '@kubernetes/client-node'
-import { createPodSpec, runContainerStep } from '../src/hooks'
-import { createJob } from '../src/k8s'
-
+import { runContainerStep } from '../src/hooks'
 import { TestHelper } from './test-setup'
-import path from 'path'
 
 jest.useRealTimers()
 

@@ -71,8 +71,6 @@ export async function createPod(
     containers.push(...services)
   }
 
-  const podTemplatePath = process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH
-
   const appPod = new k8s.V1Pod()
 
   appPod.apiVersion = 'v1'
@@ -110,6 +108,7 @@ export async function createPod(
   }
 
   //Enrich the job spec with the fields defined in the template if there is one
+  const podTemplatePath = process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH
   if (podTemplatePath !== undefined) {
     core.debug('Podtemplate provided, merging fields with pod spec')
     const yaml = fs.readFileSync(podTemplatePath, 'utf8')

@@ -50,8 +50,8 @@ export async function prepareJob(
     createdPod = await createPod(container, services, args.container.registry)
   } catch (err) {
     await prunePods()
-    if (err instanceof HttpError){
-      core.error(err.body)
+    if (err instanceof HttpError) {
+      core.error(JSON.stringify(err.body))
     }
     throw new Error(`failed to create job pod: ${err}`)
   }
