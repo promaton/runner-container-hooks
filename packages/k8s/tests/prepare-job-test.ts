@@ -115,16 +115,28 @@ describe('Prepare job', () => {
       name: 'TEST',
       value: 'testvalue'
     } as V1EnvVar)
+    expect(pod.spec?.containers[0].env).toContainEqual({
+      name: 'NODE_ENV',
+      value: 'development'
+    } as V1EnvVar)
+
     expect(pod.spec?.containers[0].resources).toEqual({
       requests: { 'ephemeral-storage': '500Mi' }
     } as V1ResourceRequirements)
+
     expect(pod.spec?.containers[0].volumeMounts).toContainEqual({
       name: 'ephemeral',
       mountPath: '/tmp'
     } as V1VolumeMount)
+    expect(pod.spec?.containers[0].volumeMounts).toContainEqual({
+      name: 'work',
+      mountPath: '/__w'
+    } as V1VolumeMount)
+
     expect(pod.spec?.volumes).toContainEqual({
       name: 'ephemeral',
       emptyDir: { sizeLimit: '500Mi' }
     } as V1Volume)
+    expect(pod.spec?.volumes?.length).toBeGreaterThan(1)
   })
 })
