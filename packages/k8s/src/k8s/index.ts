@@ -116,7 +116,7 @@ export async function createPod(
     appPod.spec = _.mergeWith(
       appPod.spec,
       template.spec,
-      concatArraysCustomizer
+      podSpecCustomizer
     )
   }
 
@@ -128,11 +128,15 @@ export async function createPod(
  * Custom function to pass to the lodash merge to merge the podSpec with the provided template.
  * Will concat all arrays it encounters during the merge, except for the container list of the spec.
  * Will also skip merging the "image", "name", "command", "args" values of the template
+ * 
+ * https://lodash.com/docs/4.17.15#merge
  */
-function concatArraysCustomizer(objValue, srcValue, key): any[] | undefined {
+function podSpecCustomizer(objValue, srcValue, key): any[] | undefined {
   if (['image', 'name', 'command', 'args'].includes(key)) {
     return objValue
   }
+
+  //check if passed object is array and concat instead of merge if yes
   if (_.isArray(objValue)) {
     if (key === 'containers') {
       return
