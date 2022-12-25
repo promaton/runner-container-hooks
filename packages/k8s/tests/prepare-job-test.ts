@@ -89,7 +89,7 @@ describe('Prepare job', () => {
     ).rejects.toThrow()
   })
 
-  it('should have the extra fields set by the jobtemplate file if env variable is set', async () => {
+  it('should have the extra fields set if ACTIONS_RUNNER_POD_TEMPLATE_PATH env variable is set', async () => {
     process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH = path.resolve(
       __dirname,
       'podtemplate.yaml'
