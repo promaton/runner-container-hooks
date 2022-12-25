@@ -113,11 +113,7 @@ export async function createPod(
     core.debug('Podtemplate provided, merging fields with pod spec')
     const yaml = fs.readFileSync(podTemplatePath, 'utf8')
     const template = k8s.loadYaml<k8s.V1Pod>(yaml)
-    appPod.spec = _.mergeWith(
-      appPod.spec,
-      template.spec,
-      podSpecCustomizer
-    )
+    appPod.spec = _.mergeWith(appPod.spec, template.spec, podSpecCustomizer)
   }
 
   const { body } = await k8sApi.createNamespacedPod(namespace(), appPod)
@@ -128,7 +124,7 @@ export async function createPod(
  * Custom function to pass to the lodash merge to merge the podSpec with the provided template.
  * Will concat all arrays it encounters during the merge, except for the container list of the spec.
  * Will also skip merging the "image", "name", "command", "args" values of the template
- * 
+ *
  * https://lodash.com/docs/4.17.15#merge
  */
 function podSpecCustomizer(objValue, srcValue, key): any[] | undefined {
