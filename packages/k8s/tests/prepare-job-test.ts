@@ -121,13 +121,9 @@ describe('Prepare job', () => {
     } as V1EnvVar)
 
     expect(pod.spec?.containers[0].resources).toEqual({
-      requests: { 'ephemeral-storage': '500Mi' }
+      requests: { cpu: '128m' }
     } as V1ResourceRequirements)
 
-    expect(pod.spec?.containers[0].volumeMounts).toContainEqual({
-      name: 'ephemeral',
-      mountPath: '/tmp'
-    } as V1VolumeMount)
     expect(pod.spec?.containers[0].volumeMounts).toContainEqual({
       name: 'work',
       mountPath: '/__w'

@@ -13,10 +13,7 @@ spec:
         - "overridden"
       resources:
         requests:
-          ephemeral-storage: "500Mi"
-      volumeMounts:
-      - name: ephemeral
-        mountPath: "/tmp"
+          cpu: "128m"
       env:
         - name: "TEST"
           value: "testvalue"
