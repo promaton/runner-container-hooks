@@ -3,7 +3,7 @@ import * as path from 'path'
 import { cleanupJob, createPodSpec } from '../src/hooks'
 import { createContainerSpec, prepareJob } from '../src/hooks/prepare-job'
 import { TestHelper } from './test-setup'
-import { createJob, createPod } from '../src/k8s'
+import { createJob, createPod, waitForPodPhases } from '../src/k8s'
 import {
   V1EnvVar,
   V1ResourceRequirements,
@@ -13,7 +13,8 @@ import {
 import { JOB_CONTAINER_NAME } from '../src/hooks/constants'
 import {
   DEFAULT_CONTAINER_ENTRY_POINT,
-  DEFAULT_CONTAINER_ENTRY_POINT_ARGS
+  DEFAULT_CONTAINER_ENTRY_POINT_ARGS,
+  PodPhase
 } from '../src/k8s/utils'
 
 jest.useRealTimers()
@@ -28,6 +29,12 @@ describe('Prepare job', () => {
   beforeEach(async () => {
     testHelper = new TestHelper()
     await testHelper.initialize()
+
+    await waitForPodPhases(
+      testHelper.podName,
+      new Set([PodPhase.RUNNING]),
+      new Set([PodPhase.PENDING])
+    )
     prepareJobData = testHelper.getPrepareJobDefinition()
     prepareJobOutputFilePath = testHelper.createFile('prepare-job-output.json')
   })
