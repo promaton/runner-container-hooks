@@ -36,53 +36,53 @@ describe('Prepare job', () => {
     await testHelper.cleanup()
   })
 
-  // it('should not throw exception', async () => {
-  //   await expect(
-  //     prepareJob(prepareJobData.args, prepareJobOutputFilePath)
-  //   ).resolves.not.toThrow()
-  // })
+  it('should not throw exception', async () => {
+    await expect(
+      prepareJob(prepareJobData.args, prepareJobOutputFilePath)
+    ).resolves.not.toThrow()
+  })
 
-  // it('should generate output file in JSON format', async () => {
-  //   await prepareJob(prepareJobData.args, prepareJobOutputFilePath)
-  //   const content = fs.readFileSync(prepareJobOutputFilePath)
-  //   expect(() => JSON.parse(content.toString())).not.toThrow()
-  // })
+  it('should generate output file in JSON format', async () => {
+    await prepareJob(prepareJobData.args, prepareJobOutputFilePath)
+    const content = fs.readFileSync(prepareJobOutputFilePath)
+    expect(() => JSON.parse(content.toString())).not.toThrow()
+  })
 
-  // it('should prepare job with absolute path for userVolumeMount', async () => {
-  //   prepareJobData.args.container.userMountVolumes = [
-  //     {
-  //       sourceVolumePath: path.join(
-  //         process.env.GITHUB_WORKSPACE as string,
-  //         '/myvolume'
-  //       ),
-  //       targetVolumePath: '/volume_mount',
-  //       readOnly: false
-  //     }
-  //   ]
-  //   await expect(
-  //     prepareJob(prepareJobData.args, prepareJobOutputFilePath)
-  //   ).resolves.not.toThrow()
-  // })
+  it('should prepare job with absolute path for userVolumeMount', async () => {
+    prepareJobData.args.container.userMountVolumes = [
+      {
+        sourceVolumePath: path.join(
+          process.env.GITHUB_WORKSPACE as string,
+          '/myvolume'
+        ),
+        targetVolumePath: '/volume_mount',
+        readOnly: false
+      }
+    ]
+    await expect(
+      prepareJob(prepareJobData.args, prepareJobOutputFilePath)
+    ).resolves.not.toThrow()
+  })
 
-  // it('should throw an exception if the user volume mount is absolute path outside of GITHUB_WORKSPACE', async () => {
-  //   prepareJobData.args.container.userMountVolumes = [
-  //     {
-  //       sourceVolumePath: '/somewhere/not/in/gh-workspace',
-  //       targetVolumePath: '/containermount',
-  //       readOnly: false
-  //     }
-  //   ]
-  //   await expect(
-  //     prepareJob(prepareJobData.args, prepareJobOutputFilePath)
-  //   ).rejects.toThrow()
-  // })
+  it('should throw an exception if the user volume mount is absolute path outside of GITHUB_WORKSPACE', async () => {
+    prepareJobData.args.container.userMountVolumes = [
+      {
+        sourceVolumePath: '/somewhere/not/in/gh-workspace',
+        targetVolumePath: '/containermount',
+        readOnly: false
+      }
+    ]
+    await expect(
+      prepareJob(prepareJobData.args, prepareJobOutputFilePath)
+    ).rejects.toThrow()
+  })
 
-  // it('should not run prepare job without the job container', async () => {
-  //   prepareJobData.args.container = undefined
-  //   await expect(
-  //     prepareJob(prepareJobData.args, prepareJobOutputFilePath)
-  //   ).rejects.toThrow()
-  // })
+  it('should not run prepare job without the job container', async () => {
+    prepareJobData.args.container = undefined
+    await expect(
+      prepareJob(prepareJobData.args, prepareJobOutputFilePath)
+    ).rejects.toThrow()
+  })
 
   it('should have the extra fields set if ACTIONS_RUNNER_POD_TEMPLATE_PATH env variable is set', async () => {
     process.env.ACTIONS_RUNNER_POD_TEMPLATE_PATH = path.resolve(
