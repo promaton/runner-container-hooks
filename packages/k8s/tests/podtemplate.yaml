@@ -17,7 +17,7 @@ spec:
       env:
         - name: "TEST"
           value: "testvalue"
-  volumes:
-    - name: ephemeral
-      emptyDir:
-        sizeLimit: 500Mi
+  # volumes:
+  #   - name: ephemeral
+  #     emptyDir:
+  #       sizeLimit: 500Mi
