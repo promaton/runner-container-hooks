@@ -137,9 +137,9 @@ exec ${environmentPrefix} ${entryPoint} ${
   }
 }
 
-export function generateContainerName(image: string): string{
+export function generateContainerName(image: string): string {
   const name = image.split('/').pop()
-  return name?.split(":").at(0) || "service"
+  return name?.split(':').at(0) || 'service'
 }
 
 export enum PodPhase {
