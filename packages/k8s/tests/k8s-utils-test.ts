@@ -226,6 +226,7 @@ describe('k8s utils', () => {
 
     it('should return the container name from image string', () => {
       expect(generateContainerName("public.ecr.aws/localstack/localstack")).toEqual("localstack")
+      expect(generateContainerName("public.ecr.aws/url/with/multiple/slashes/postgres:latest")).toEqual("postgres")
       expect(generateContainerName("postgres")).toEqual("postgres")
       expect(generateContainerName("postgres:latest")).toEqual("postgres")
       expect(generateContainerName("localstack/localstack")).toEqual("localstack")
