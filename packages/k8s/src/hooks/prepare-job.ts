@@ -28,14 +28,14 @@ export async function prepareJob(
     throw new Error('Job Container is required.')
   }
 
-  core.debug("running prepareJob on version 0.3.7")
+  core.debug("running prepareJob on version 0.3.8")
   core.debug(JSON.stringify(args))
 
   await prunePods()
   await copyExternalsToRoot()
   let container: k8s.V1Container | undefined = undefined
   if (args.container?.image) {
-    core.debug(`Using image '${args.container.image}' for job image, v0.3.7`)
+    core.debug(`Using image '${args.container.image}' for job image, v0.3.8`)
     container = createContainerSpec(args.container, JOB_CONTAINER_NAME, true)
   }
 
@@ -182,8 +182,8 @@ export function createContainerSpec(
     podContainer.workingDir = container.workingDirectory
   }
   
-  const podCommand = container.entryPoint !== undefined ? [container.entryPoint] : undefined
-  if (podCommand !== undefined){
+  const podCommand = container.entryPoint ? [container.entryPoint] : undefined
+  if (podCommand !== undefined ){
     podContainer.command = podCommand
   }
 
