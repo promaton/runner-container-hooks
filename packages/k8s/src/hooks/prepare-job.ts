@@ -169,17 +169,19 @@ export function createContainerSpec(
     container.entryPointArgs = DEFAULT_CONTAINER_ENTRY_POINT_ARGS
   }
 
-  const podCommand = container.entryPoint !== undefined ? [container.entryPoint] : undefined
-
   const podContainer = {
     name,
     image: container.image,
-    command: podCommand,
     args: container.entryPointArgs,
     ports: containerPorts(container)
   } as k8s.V1Container
   if (container.workingDirectory) {
     podContainer.workingDir = container.workingDirectory
+  }
+  
+  const podCommand = container.entryPoint !== undefined ? [container.entryPoint] : undefined
+  if (podCommand !== undefined){
+    podContainer.command = podCommand
   }
 
   podContainer.env = []
