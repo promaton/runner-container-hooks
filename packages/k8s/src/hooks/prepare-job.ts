@@ -18,7 +18,7 @@ import {
   PodPhase
 } from '../k8s/utils'
 import { JOB_CONTAINER_NAME } from './constants'
-import { HttpError } from '@kubernetes/client-node'
+import { CoreV1EndpointPort, HttpError } from '@kubernetes/client-node'
 
 export async function prepareJob(
   args: prepareJobArgs,
@@ -28,13 +28,14 @@ export async function prepareJob(
     throw new Error('Job Container is required.')
   }
 
-  core.debug("running prepareJob on version 0.3.6")
+  core.debug("running prepareJob on version 0.3.7")
+  core.debug(JSON.stringify(args))
 
   await prunePods()
   await copyExternalsToRoot()
   let container: k8s.V1Container | undefined = undefined
   if (args.container?.image) {
-    core.debug(`Using image '${args.container.image}' for job image, v0.3.6`)
+    core.debug(`Using image '${args.container.image}' for job image, v0.3.7`)
     container = createContainerSpec(args.container, JOB_CONTAINER_NAME, true)
   }
 
