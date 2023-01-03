@@ -28,6 +28,8 @@ export async function prepareJob(
     throw new Error('Job Container is required.')
   }
 
+  core.debug("running prepareJob on version 0.3.5")
+
   await prunePods()
   await copyExternalsToRoot()
   let container: k8s.V1Container | undefined = undefined
