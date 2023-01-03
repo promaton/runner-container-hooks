@@ -6,7 +6,7 @@
             "name": "run prepare job tests",
             "request": "launch",
             "program": "${workspaceFolder}/packages/k8s/node_modules/.bin/jest",
-            "args": ["packages/k8s/tests/k8s-utils-test.ts", "--runInBand"],
+            "args": ["${relativeFile}", "--runInBand"],
             "cwd": "${workspaceFolder}/packages/k8s",
             "console": "integratedTerminal",
         }
