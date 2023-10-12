@@ -125,8 +125,9 @@ export function writeEntryPointScript(
   const content = `#!/bin/sh -l
 ${exportPath}
 cd ${workingDirectory} && \
-exec ${environmentPrefix} ${entryPoint} ${entryPointArgs?.length ? entryPointArgs.join(' ') : ''
-    }
+exec ${environmentPrefix} ${entryPoint} ${
+    entryPointArgs?.length ? entryPointArgs.join(' ') : ''
+  }
 `
   const filename = `${uuidv4()}.sh`
   const entryPointPath = `${process.env.RUNNER_TEMP}/${filename}`
