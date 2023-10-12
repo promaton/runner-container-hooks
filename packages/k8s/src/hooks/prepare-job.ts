@@ -18,7 +18,7 @@ import {
   PodPhase
 } from '../k8s/utils'
 import { JOB_CONTAINER_NAME } from './constants'
-import { CoreV1EndpointPort, HttpError } from '@kubernetes/client-node'
+import { HttpError } from '@kubernetes/client-node'
 
 export async function prepareJob(
   args: prepareJobArgs,
