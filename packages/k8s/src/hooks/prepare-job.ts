@@ -28,7 +28,7 @@ export async function prepareJob(
     throw new Error('Job Container is required.')
   }
 
-  core.debug("running prepareJob on version 0.3.8")
+  core.debug('running prepareJob on version 0.3.9')
   core.debug(JSON.stringify(args))
 
   await prunePods()
@@ -181,9 +181,9 @@ export function createContainerSpec(
   if (container.workingDirectory) {
     podContainer.workingDir = container.workingDirectory
   }
-  
+
   const podCommand = container.entryPoint ? [container.entryPoint] : undefined
-  if (podCommand !== undefined ){
+  if (podCommand !== undefined) {
     podContainer.command = podCommand
   }
 

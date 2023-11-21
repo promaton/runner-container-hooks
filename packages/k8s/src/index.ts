@@ -9,7 +9,6 @@ import {
 import { isAuthPermissionsOK, namespace, requiredPermissions } from './k8s'
 
 async function run(): Promise<void> {
-
   let exitCode = 0
   try {
     const input = await getInputFromStdin()
