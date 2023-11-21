@@ -19,6 +19,7 @@ export async function getInputFromStdin(): Promise<HookData> {
   return inputJson as HookData
 }
 
+//@ts-ignore
 export function writeToResponseFile(filePath: string, message: any): void {
   if (!filePath) {
     throw new Error(`Expected file path`)
@@ -32,6 +33,7 @@ export function writeToResponseFile(filePath: string, message: any): void {
   })
 }
 
+//@ts-ignore
 function toCommandValue(input: any): string {
   if (input === null || input === undefined) {
     return ''
