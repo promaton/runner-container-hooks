@@ -127,6 +127,7 @@ export async function createPod(
  *
  * https://lodash.com/docs/4.17.15#mergeWith
  */
+//@ts-ignore
 function podSpecCustomizer(objValue, srcValue, key): any[] | undefined {
   if (['image', 'name', 'command', 'args'].includes(key)) {
     return objValue
