@@ -9,7 +9,6 @@ import {
 import { isAuthPermissionsOK, namespace, requiredPermissions } from './k8s'
 
 async function run(): Promise<void> {
-  let exitCode = 0
   try {
     const input = await getInputFromStdin()
 
@@ -25,28 +24,33 @@ async function run(): Promise<void> {
         )} on the pod resource in the '${namespace()}' namespace. Please contact your self hosted runner administrator.`
       )
     }
+    let exitCode = 0
     switch (command) {
       case Command.PrepareJob:
         await prepareJob(args as prepareJobArgs, responseFile)
-        break
+        return process.exit(0)
       case Command.CleanupJob:
         await cleanupJob()
-        break
+        return process.exit(0)
       case Command.RunScriptStep:
         await runScriptStep(args, state, null)
-        break
+        return process.exit(0)
       case Command.RunContainerStep:
         exitCode = await runContainerStep(args)
-        break
+        return process.exit(exitCode)
       case Command.runContainerStep:
       default:
         throw new Error(`Command not recognized: ${command}`)
     }
   } catch (error) {
     core.error(error as Error)
-    exitCode = 1
+    process.exit(1)
   }
-  process.exitCode = exitCode
 }
 
-void run()
+run().then(() => {
+  core.info('action container hook successful')
+}).catch((error) => {
+  core.error(error as Error)
+  process.exit(1)
+})
