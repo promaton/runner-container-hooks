@@ -250,7 +250,6 @@ export async function execPodStep(
     } catch (error) {
       core.error(`Failed to exec pod step`)
       core.error(error as Error)
-      reject(error)
     }
   })
 }
