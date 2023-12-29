@@ -87,6 +87,7 @@ export async function createPod(
   appPod.spec = new k8s.V1PodSpec()
   appPod.spec.containers = containers
   appPod.spec.restartPolicy = 'Never'
+  appPod.spec.serviceAccountName = getJobPodName()
   appPod.spec.nodeName = await getCurrentNodeName()
 
   const claimName = getVolumeClaimName()
