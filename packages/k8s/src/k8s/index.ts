@@ -14,6 +14,7 @@ import {
 } from '../hooks/constants'
 import { PodPhase } from './utils'
 import * as fs from 'fs'
+import { backOff } from 'exponential-backoff'
 
 const kc = new k8s.KubeConfig()
 
@@ -222,36 +223,68 @@ export async function execPodStep(
 ): Promise<void> {
   const exec = new k8s.Exec(kc)
   await new Promise(async function (resolve, reject) {
+    const backOffOptions = {
+      numOfAttempts: 3,
+      retry: (e, attemptNumber) => {
+        core.debug(e.toString())
+        core.debug(
+          `an error occurred trying to execute command in pod, retrying (${attemptNumber}/3)`
+        )
+        return true
+      }
+    }
     try {
-      await exec.exec(
-        namespace(),
-        podName,
-        containerName,
-        command,
-        process.stdout,
-        process.stderr,
-        stdin ?? null,
-        false /* tty */,
-        resp => {
-          // kube.exec returns an error if exit code is not 0, but we can't actually get the exit code
-          if (resp.status === 'Success') {
-            resolve(resp.code)
-          } else {
-            core.debug(
-              JSON.stringify({
-                message: resp?.message,
-                details: resp?.details
-              })
-            )
-            reject(resp?.message)
-          }
-        }
-      )
-    } catch (error) {
-      core.error(`Failed to exec pod step`)
-      core.error(error as Error)
+      await backOff(async () => {
+        await execInPod(
+          exec,
+          command,
+          podName,
+          containerName,
+          resolve,
+          reject,
+          stdin
+        )
+      }, backOffOptions)
+    } catch (e) {
+      core.debug('something went wrong in calling pod exec')
+      reject(e)
     }
   })
+}
+
+async function execInPod(
+  exec: k8s.Exec,
+  command: string[],
+  podName: string,
+  containerName: string,
+  resolve: (value?: number | PromiseLike<number> | undefined) => void,
+  reject: (reason?: any) => void,
+  stdin?: stream.Readable
+): Promise<void> {
+  await exec.exec(
+    namespace(),
+    podName,
+    containerName,
+    command,
+    process.stdout,
+    process.stderr,
+    stdin ?? null,
+    false /* tty */,
+    resp => {
+      // kube.exec returns an error if exit code is not 0, but we can't actually get the exit code
+      if (resp.status === 'Success') {
+        resolve(resp.code)
+      } else {
+        core.debug(
+          JSON.stringify({
+            message: resp?.message,
+            details: resp?.details
+          })
+        )
+        reject(resp?.message)
+      }
+    }
+  )
 }
 
 export async function waitForJobToComplete(jobName: string): Promise<void> {
